@@ -1,0 +1,159 @@
+<!doctype html>
+<title>Détecteur d'ovalbumine</title>
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Test à flux latéral - Ovalbumine</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+    <style>
+        body {
+        padding-top: 70px;
+        padding-bottom: 30px;
+        }
+
+        .theme-dropdown .dropdown-menu {
+        position: static;
+        display: block;
+        margin-bottom: 20px;
+        }
+
+        .theme-showcase > p > .btn {
+        margin: 5px 0;
+        }
+
+        .theme-showcase .navbar .container {
+        width: auto;
+        }
+        .btn-outline-secondary {
+            margin-top:10px;
+        }
+    </style>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+  <body>
+    
+    <div class="container theme-showcase" role="main">
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    {% if view == "homepage" %}
+    <div class="jumbotron">
+        <h1>Détecteur d'ovalbumine</h1>
+        <h2>Explorez l'avenir de l'analyse alimentaire avec notre plateforme innovante !</h2>
+        <h3>
+        <ul>
+            <li><a href="{{ url_for('new_calibration') }}">Générer une nouvelle droite de calibration</a></li>
+            <li><a href="{{ url_for('current_calibration') }}">Visualiser la droite de calibration actuelle</a></li>
+            <li><a href="{{ url_for('test_sample') }}">Mesurer la concentration en ovalbumine d'un échantillon</a></li>
+        </ul>
+    </h3>
+    </div>
+
+    {% elif view == "new_calibration" %}
+
+    <div class="page-header">
+      <h1>Nouvelle droite de calibration</h1>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Importation des clichés de calibration</h3>
+        </div>
+        <div class="panel-body">
+            <form method=post id="new-calibration-form" enctype=multipart/form-data>
+                <label for="photo1">Importation des clichés de calibration (ex : 1000.jpeg indique une dilution de 1000) </label>
+                <input type="file" class="form-control" name="calibration-files" aria-describedby="inputGroupFileAddon04" id="photo1" aria-label="Upload" multiple /> <!-- Clichés de calibration -->
+                <input type="submit" class="btn btn-outline-secondary" value="Importer">
+            </form>
+        </div>
+    </div>
+
+    {% elif view == "test_sample" %}
+
+    <div class="page-header">
+      <h1>Mesure de la concentration en ovalbumine d'un échantillon</h1>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Importation des clichés de calibration</h3>
+        </div>
+        <div class="panel-body">
+            <form method=post id="sample-test-form" enctype=multipart/form-data>
+                <label for="photo-sample">Importation du cliché</label>
+                <input type="file" class="form-control" name="photo-sample-file" aria-describedby="inputGroupFileAddon04" id="photo-sample" aria-label="Upload" /> <!-- Cliché 1 -->
+                <input type="submit" class="btn btn-outline-secondary" value="Importer">
+            </form>
+        </div>
+    </div>
+
+    <!-- Si on a les résultats -->
+    {% elif view == "test_sample_finished" %}
+
+    <div class="jumbotron">
+      <h1>Résultats de l'analyse de l'échantillon</h1>
+
+      {% if concentration %}
+
+      <h2>Voici les résultats :</h2>
+
+      {% else %}
+
+      <h2>Une erreur est survenue lors de la mesure de la concentration en ovalbumine de l'échantillon !</h2>
+
+      {% endif %}
+    </div>
+
+    {% elif view == "current_calibration" %}
+
+    <div class="page-header">
+      <h1>Visualisation de la droite de calibration</h1>
+    </div>
+
+    <!-- Si une calibration a été établie, l'afficher. Sinon, dire qu'il n'y a pas de calibration disponible et pointer vers le lien de la page de calibration. -->
+
+      {% if calibration_line %}
+        <div id="graph" style="text-align: center;">
+          {{ calibration_line | safe }}
+        </div>
+      {% else %}
+      <p>Impossible de générer la droite de calibration !</p>
+      {% endif %}
+
+
+
+
+    {% else %}
+
+    <!-- Erreur 404 -->
+    <div class="jumbotron">
+      <h1>Erreur 404</h1>
+      <h2>La page que vous tentez de charger n'existe pas.</h2>
+    </div>
+
+    {% endif %}
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+  </body>
+</html>
+
+<!-- Bootstrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
